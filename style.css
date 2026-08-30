@@ -1,0 +1,917 @@
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+
+:root {
+    --void: #05060a;
+    --panel: #0b0d12;
+    --panel-soft: rgba(255, 255, 255, .03);
+    --line: rgba(255, 255, 255, .09);
+
+    --moss: #3d7057;
+    --moss-bright: #6bb08c;
+    --ember: #ffd166;
+    --steel: #5b7cff;
+    
+    --neon-green-bright: #39ff14;
+    --neon-green-dim: rgba(57, 255, 20, 0.4);
+    --neon-green-btn: #6cff4c;
+
+    --ink: #e9edec;
+    --mist: #8c9aa5;
+    --dim: #626d76;
+
+    --font-display: 'Syne', Arial, sans-serif;
+    --font-body: 'Manrope', Arial, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+
+/* ============================================================
+   RESET
+   ============================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: var(--void);
+    color: var(--ink);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+}
+
+a {
+    font-family: inherit;
+}
+
+:focus-visible {
+    outline: 2px solid var(--moss-bright);
+    outline-offset: 3px;
+}
+
+
+/* ============================================================
+   FLOATING TRIANGLE SPACE BACKGROUND
+   ============================================================ */
+
+#spatial-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    display: block;
+}
+
+
+/* ============================================================
+   ALL WEBSITE CONTENT ABOVE BACKGROUND
+   ============================================================ */
+
+header,
+section,
+footer {
+    position: relative;
+    z-index: 2;
+}
+
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 22px 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 20;
+    background: rgba(5, 6, 10, 0.55);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+}
+
+.logo {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: 3px;
+    font-size: 15px;
+}
+
+nav {
+    display: flex;
+    gap: 28px;
+}
+
+nav a {
+    color: var(--mist);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .06em;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 0%;
+    height: 1px;
+    background: var(--moss-bright);
+    transition: width .3s ease;
+}
+
+nav a:hover {
+    color: var(--ink);
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+
+/* ============================================================
+   SHARED SECTION EYEBROW / LABEL
+   ============================================================ */
+
+.label {
+    color: var(--dim);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 4px;
+}
+
+section h2 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(38px, 6.5vw, 74px);
+    margin: 16px 0 46px;
+    letter-spacing: -0.01em;
+}
+
+section h2 span {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--moss-bright);
+}
+
+
+/* ============================================================
+   HERO
+   ============================================================ */
+
+.hero {
+    height: 100vh;
+    min-height: 650px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 100px 7%;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 30% 40%, rgba(61, 112, 87, 0.14) 0%, transparent 55%),
+        radial-gradient(circle at center, rgba(15, 17, 23, 0.74) 0%, rgba(8, 9, 13, 0.74) 65%, rgba(5, 5, 8, 0.82) 100%);
+    z-index: 2;
+}
+
+.hero-text {
+    width: 54%;
+    position: relative;
+    z-index: 5;
+}
+
+.hero-text p {
+    font-family: var(--font-mono);
+    color: var(--moss-bright);
+    font-size: 12px;
+    letter-spacing: 4px;
+}
+
+h1 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(52px, 9vw, 118px);
+    line-height: 0.86;
+    margin: 22px 0;
+    letter-spacing: -0.01em;
+}
+
+h1 span {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--mist);
+}
+
+.hero h2 {
+    font-family: var(--font-body);
+    font-size: clamp(19px, 2.6vw, 26px);
+    max-width: 460px;
+    font-weight: 500;
+    color: var(--mist);
+    margin: 0;
+    letter-spacing: 0;
+}
+
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.buttons {
+    margin-top: 34px;
+    display: flex;
+    gap: 12px;
+}
+
+.buttons a {
+    padding: 15px 22px;
+    border: 1px solid #444a51;
+    color: var(--ink);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+    transition: 0.3s ease;
+    display: inline-block;
+}
+
+.buttons a:hover {
+    border-color: var(--moss-bright);
+    color: var(--moss-bright);
+    transform: translateY(-2px);
+}
+
+.buttons a:first-child {
+    background: var(--ink);
+    color: var(--void);
+    border-color: var(--ink);
+}
+
+.buttons a:first-child:hover {
+    background: var(--moss-bright);
+    border-color: var(--moss-bright);
+    color: var(--void);
+}
+
+
+/* ============================================================
+   3D MODEL PANEL — HERO
+   ============================================================ */
+
+.model {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 5%;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: auto;
+}
+
+#app,
+#app canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+
+/* ============================================================
+   LOADING SCREEN
+   ============================================================ */
+
+#loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--void);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    transition: opacity 0.6s ease;
+}
+
+.spinner {
+    width: 34px;
+    height: 34px;
+    border: 2px solid rgba(255, 255, 255, .12);
+    border-top-color: var(--moss-bright);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    margin-bottom: 16px;
+}
+
+#loading-text {
+    color: var(--mist);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spinner {
+        animation: none;
+        border-top-color: var(--moss-bright);
+    }
+}
+
+
+/* ============================================================
+   MIST
+   ============================================================ */
+
+.mist {
+    position: absolute;
+    bottom: 0;
+    left: -10%;
+    width: 120%;
+    height: 250px;
+    background: radial-gradient(ellipse, rgba(107, 176, 140, .12), transparent 70%);
+    filter: blur(30px);
+    animation: fog 12s infinite alternate;
+    z-index: 4;
+    pointer-events: none;
+}
+
+@keyframes fog {
+    from { transform: translateX(-5%); }
+    to { transform: translateX(5%); }
+}
+
+
+/* ============================================================
+   SCROLL INDICATOR
+   ============================================================ */
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 34px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 38px;
+    border: 2px solid #444a51;
+    border-radius: 14px;
+    z-index: 6;
+}
+
+.scroll-indicator span {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    width: 4px;
+    height: 8px;
+    background: var(--moss-bright);
+    border-radius: 2px;
+    transform: translateX(-50%);
+    animation: scrollDot 1.6s infinite;
+}
+
+@keyframes scrollDot {
+    0% { opacity: 1; top: 6px; }
+    70% { opacity: 0; top: 20px; }
+    100% { opacity: 0; top: 6px; }
+}
+
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+
+section:not(.hero) {
+    min-height: 60vh;
+    padding: 130px 8%;
+    border-top: 1px solid var(--line);
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    position: relative;
+    z-index: 2;
+    background: rgba(3, 4, 5, 0.16);
+}
+
+section:not(.hero).visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.description {
+    max-width: 650px;
+    color: var(--mist);
+    line-height: 1.8;
+    font-size: 18px;
+}
+
+
+/* ============================================================
+   ABOUT
+   ============================================================ */
+
+.about-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.about-text {
+    flex: 1;
+    position: relative;
+    z-index: 4;
+}
+
+.about-text .description + .description {
+    margin-top: 18px;
+}
+
+.tech-core-model {
+    flex: 1;
+    height: 400px;
+    position: relative;
+    z-index: 3;
+}
+
+#tech-core-app,
+#tech-core-app canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+
+/* ============================================================
+   SKILLS — CARDS
+   ============================================================ */
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.cards div {
+    padding: 32px;
+    min-height: 180px;
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    transition: .3s;
+    position: relative;
+    z-index: 3;
+}
+
+.cards div:hover {
+    transform: translateY(-8px);
+    border-color: var(--moss-bright);
+}
+
+.cards h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: .04em;
+    margin: 20px 0;
+}
+
+.cards p {
+    color: var(--dim);
+    line-height: 1.6;
+    font-family: var(--font-mono);
+    font-size: 13px;
+}
+
+.cards small {
+    color: var(--moss-bright);
+    font-family: var(--font-mono);
+    letter-spacing: .1em;
+}
+
+
+/* ============================================================
+   JOURNEY — QUEST LOG TIMELINE
+   ============================================================ */
+
+.quest-log {
+    position: relative;
+    max-width: 780px;
+}
+
+.quest-log::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 10px;
+    bottom: 10px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--moss-bright), var(--line) 85%);
+}
+
+.quest {
+    position: relative;
+    padding: 0 0 46px 56px;
+}
+
+.quest:last-child {
+    padding-bottom: 0;
+}
+
+.quest-node {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--dim);
+}
+
+.quest[data-state="complete"] .quest-node {
+    border-color: var(--ember);
+    color: var(--ember);
+}
+
+.quest[data-state="active"] .quest-node {
+    border-color: var(--moss-bright);
+    color: var(--moss-bright);
+    box-shadow: 0 0 0 4px rgba(107, 176, 140, 0.12);
+    animation: questPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes questPulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(107, 176, 140, 0.12); }
+    50% { box-shadow: 0 0 0 8px rgba(107, 176, 140, 0.05); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .quest[data-state="active"] .quest-node {
+        animation: none;
+    }
+}
+
+.quest-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.quest-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    color: var(--dim);
+}
+
+.quest-status {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .08em;
+    padding: 3px 9px;
+    border: 1px solid var(--line);
+    color: var(--dim);
+}
+
+.quest[data-state="complete"] .quest-status {
+    color: var(--ember);
+    border-color: rgba(255, 209, 102, 0.4);
+}
+
+.quest[data-state="active"] .quest-status {
+    color: var(--moss-bright);
+    border-color: rgba(107, 176, 140, 0.4);
+}
+
+.quest h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.quest[data-state="locked"] h3,
+.quest[data-state="locked"] p {
+    color: var(--dim);
+}
+
+.quest p {
+    color: var(--mist);
+    line-height: 1.7;
+    max-width: 520px;
+}
+
+
+/* ============================================================
+   PROJECTS
+   ============================================================ */
+
+#projects .cards p {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--mist);
+}
+
+
+/* ============================================================
+   CONTACT
+   ============================================================ */
+
+.contact {
+    text-align: left;
+}
+
+.contact > .description {
+    margin-bottom: 42px;
+}
+
+.contact-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+/* 1. Terminal-style contact console */
+.contact-console {
+    width: 100%;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    overflow: hidden;
+}
+
+.console-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255, 255, 255, .02);
+}
+
+.console-bar .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot.red { background: #e5645a; }
+.dot.amber { background: var(--ember); }
+.dot.green { background: var(--moss-bright); }
+
+.console-title {
+    margin-left: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--dim);
+    letter-spacing: .04em;
+}
+
+.console-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.console-row {
+    display: grid;
+    grid-template-columns: 90px 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    border: none;
+    border-bottom: 1px solid var(--line);
+    background: none;
+    color: var(--ink);
+    text-decoration: none;
+    text-align: left;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    transition: background .25s ease;
+    width: 100%;
+}
+
+.console-row:last-child {
+    border-bottom: none;
+}
+
+.console-row:hover {
+    background: rgba(107, 176, 140, 0.06);
+}
+
+.row-label {
+    font-size: 11px;
+    letter-spacing: .08em;
+    color: var(--dim);
+}
+
+.row-value {
+    font-size: 14px;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.row-action {
+    font-size: 11px;
+    letter-spacing: .06em;
+    color: var(--moss-bright);
+    white-space: nowrap;
+}
+
+
+/* 2. Neon Contact Form (Based on image_793fb1.png) */
+
+/* ============================================================
+   UPDATED CONTACT FORM (Matches Portfolio Theme)
+   ============================================================ */
+
+.contact-form-card {
+    background: radial-gradient(circle at top left, rgba(107, 176, 140, 0.1) 0%, rgba(11, 13, 18, 0.9) 50%);
+    background-color: var(--panel);
+    border: 1px solid rgba(107, 176, 140, 0.25);
+    border-radius: 20px;
+    padding: 35px 30px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5) inset;
+    width: 100%;
+}
+
+.contact-form-card h3 {
+    color: var(--moss-bright);
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 30px;
+    letter-spacing: -0.02em;
+}
+
+.form-group label {
+    display: block;
+    color: var(--mist);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    background: var(--void);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--moss-bright);
+    box-shadow: 0 0 12px rgba(107, 176, 140, 0.2);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--dim);
+}
+
+.submit-btn {
+    width: 100%;
+    background: var(--moss-bright);
+    color: var(--void);
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(107, 176, 140, 0.25);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(107, 176, 140, 0.4);
+    background: #509371;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+footer {
+    padding: 30px;
+    text-align: center;
+    color: var(--dim);
+    border-top: 1px solid var(--line);
+    position: relative;
+    z-index: 3;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: rgba(3, 4, 5, .3);
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .contact-wrapper {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    nav {
+        display: none;
+    }
+
+    .hero-text {
+        width: 100%;
+        z-index: 6;
+    }
+
+    .model {
+        opacity: .4;
+        z-index: 3;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    section:not(.hero) {
+        padding: 100px 7%;
+    }
+
+    .about-container {
+        flex-direction: column;
+    }
+
+    .tech-core-model {
+        width: 100%;
+        height: 300px;
+    }
+
+    .console-row {
+        grid-template-columns: 70px 1fr auto;
+        padding: 16px;
+    }
+
+    .row-value {
+        font-size: 12px;
+    }
+
+}
+
+    
+.contact-subtitle {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--dim);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}

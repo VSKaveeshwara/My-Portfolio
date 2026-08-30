@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Venuka Sahan | Portfolio</title>
+    <meta name="description" content="Venuka Sahan — Computer Science undergraduate and aspiring software engineer.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Custom styling for the contact section to match reference image -->
+    <style>
+        .contact-form-card {
+            background-color: #121214;
+            border: 1px solid #222226;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        .contact-form-card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #00e676;
+            margin-bottom: 28px;
+            text-shadow: 0 0 20px rgba(0, 230, 118, 0.2);
+        }
+        .contact-form-card .form-group {
+            margin-bottom: 22px;
+        }
+        .contact-form-card label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            color: #888892;
+            margin-bottom: 8px;
+        }
+        .contact-form-card input,
+        .contact-form-card textarea {
+            width: 100%;
+            background-color: #09090b;
+            border: 1px solid #24242c;
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: #ffffff;
+            font-family: 'Manrope', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        .contact-form-card input:focus,
+        .contact-form-card textarea:focus {
+            border-color: #00e676;
+        }
+        .contact-form-card input::placeholder,
+        .contact-form-card textarea::placeholder {
+            color: #555560;
+        }
+        .email-input-wrapper {
+            position: relative;
+        }
+        .email-input-wrapper input {
+            padding-right: 45px;
+        }
+        .email-lock-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ff5252;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+        }
+        .contact-form-card .submit-btn {
+            width: 100%;
+            background-color: #00e676;
+            color: #09090b;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(0, 230, 118, 0.3);
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            margin-top: 10px;
+        }
+        .contact-form-card .submit-btn:hover {
+            background-color: #00c853;
+        }
+        .contact-form-card .submit-btn svg {
+            transform: rotate(45deg);
+        }
+    </style>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+        }
+    }
+    </script>
+
+</head>
+
+<body>
+
+    <!-- =====================================================
+         FLOATING TRIANGLE SPACE BACKGROUND
+         ===================================================== -->
+
+    <canvas id="spatial-canvas"></canvas>
+
+
+    <!-- =====================================================
+         LOADING
+         ===================================================== -->
+
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p id="loading-text">Loading 0%</p>
+    </div>
+
+
+    <!-- =====================================================
+         NAVBAR
+         ===================================================== -->
+
+    <header>
+        <div class="logo">VSK</div>
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#skills">Skills</a>
+            <a href="#journey">Journey</a>
+            <a href="#projects">Projects</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
+
+    <section id="home" class="hero">
+
+        <div class="hero-text">
+            <p>K.A.V.S. KAVEESHWARA</p>
+            <h1>
+                VENUKA<br>
+                <span>SAHAN</span>
+            </h1>
+            <h2>Where Concepts Become Code And Code Becomes Experiences</h2>
+
+            <div class="buttons">
+                <a href="#projects">PROJECTS</a>
+                <a href="#contact">CONTACT</a>
+            </div>
+        </div>
+
+        <div class="model">
+            <div id="app"></div>
+        </div>
+
+        <div class="mist"></div>
+
+        <a href="#about" class="scroll-indicator" aria-label="Scroll down">
+            <span></span>
+        </a>
+
+    </section>
+
+
+    <!-- =====================================================
+         ABOUT
+         ===================================================== -->
+
+    <section id="about">
+        <div class="about-container">
+            <div class="about-text">
+                <p class="label">01 / ABOUT</p>
+                <h2>ABOUT <span>ME</span></h2>
+                <p class="description">
+                    Hi, I'm Venuka Sahan, a Computer Science undergraduate and aspiring software engineer.
+                    I completed my G.C.E. Ordinary Level with 5 A passes and 4 B passes, and my
+                    G.C.E. Advanced Level with 3 C passes.
+                </p>
+                <p class="description">
+                    I'm passionate about technology, programming, and web development, and I enjoy
+                    learning new things by building real projects. My goal is to become a skilled
+                    software engineer.
+                </p>
+            </div>
+
+            <div class="tech-core-model">
+                <div id="tech-core-app"></div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- =====================================================
+         SKILLS
+         ===================================================== -->
+
+    <section id="skills">
+        <p class="label">02 / SKILLS</p>
+        <h2>MY <span>ARSENAL</span></h2>
+        <div class="cards">
+            <div>
+                <small>LANGUAGES</small>
+                <h3>PROGRAMMING</h3>
+                <p>Java • C++ • Python • JavaScript</p>
+            </div>
+            <div>
+                <small>BROWSER</small>
+                <h3>WEB</h3>
+                <p>HTML • CSS • JavaScript • Three.js • Blender</p>
+            </div>
+            <div>
+                <small>STORAGE</small>
+                <h3>DATABASE</h3>
+                <p>SQL • MySQL • Database Design • PHP</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- =====================================================
+         JOURNEY
+         ===================================================== -->
+
+    <section id="journey">
+        <p class="label">03 / JOURNEY</p>
+        <h2>MY <span>QUEST LOGS</span></h2>
+        <div class="quest-log">
+            <div class="quest" data-state="complete">
+                <div class="quest-node">01</div>
+                <div class="quest-eyebrow">
+                    <span class="quest-tag">G.C.E. ORDINARY LEVEL</span>
+                    <span class="quest-status">COMPLETE</span>
+                </div>
+                <h3>O/L Examination</h3>
+                <p>Passed with 5 A passes and 4 B passes.</p>
+            </div>
+
+            <div class="quest" data-state="complete">
+                <div class="quest-node">02</div>
+                <div class="quest-eyebrow">
+                    <span class="quest-tag">G.C.E. ADVANCED LEVEL</span>
+                    <span class="quest-status">COMPLETE</span>
+                </div>
+                <h3>A/L Examination</h3>
+                <p>Passed with 3 C passes.</p>
+            </div>
+
+            <div class="quest" data-state="active">
+                <div class="quest-node">03</div>
+                <div class="quest-eyebrow">
+                    <span class="quest-tag">UNDERGRADUATE DEGREE</span>
+                    <span class="quest-status">IN PROGRESS</span>
+                </div>
+                <h3>B.Sc. in Software Engineering</h3>
+                <p>Currently studying, building projects, and sharpening my skills through practical, hands-on work.</p>
+            </div>
+
+            <div class="quest" data-state="locked">
+                <div class="quest-node">04</div>
+                <div class="quest-eyebrow">
+                    <span class="quest-tag">CAREER</span>
+                    <span class="quest-status">NEXT UP</span>
+                </div>
+                <h3>Software Engineer</h3>
+                <p>The next stage: putting everything I've learned to work in a professional engineering role.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- =====================================================
+         PROJECTS
+         ===================================================== -->
+
+    <section id="projects">
+        <p class="label">04 / PROJECTS</p>
+        <h2>MY <span>PROJECTS</span></h2>
+        <div class="cards">
+            <div>
+                <small>MISSION 01</small>
+                <h3>WATER CLEANING BOAT</h3>
+                <p>Autonomous boat designed to collect floating waste from water.</p>
+            </div>
+            <div>
+                <small>MISSION 02</small>
+                <h3>3D WEB SITE</h3>
+                <p>This is a 3D web site built with Three.js.</p>
+            </div>
+            <div>
+                <small>MISSION 03</small>
+                <h3>WEB PROJECT</h3>
+                <p>Travel booking system web site. (Pending...)</p>
+            </div>
+        </div>
+    </section>
+
+<!-- =====================================================
+     CONTACT SECTION (Updated to match reference layout)
+     ===================================================== -->
+
+<section id="contact" class="contact">
+    <p class="label">05 / CONTACT</p>
+    <h2>CONTACT <span>INFO</span></h2>
+    <p class="description">
+        Thanks for your interest — reach out through any of the channels below or send a direct message.
+    </p>
+
+    <div class="contact-wrapper">
+        
+        <!-- Contact Console with Subtitle -->
+        <div class="contact-col">
+            <p class="contact-subtitle">SEND A DIRECT MESSAGE.</p>
+            <div class="contact-console">
+                <div class="console-bar">
+                    <span class="dot red"></span>
+                    <span class="dot amber"></span>
+                    <span class="dot green"></span>
+                    <span class="console-title">contact.channel</span>
+                </div>
+                <div class="console-body">
+                    <button class="console-row" type="button" data-copy="vskaweeshwara1215@gmail.com">
+                        <span class="row-label">EMAIL</span>
+                        <span class="row-value">vskaweeshwara1215@gmail.com</span>
+                        <span class="row-action">COPY</span>
+                    </button>
+                    <a class="console-row" href="https://github.com/VSKaveeshwara" target="_blank" rel="noopener">
+                        <span class="row-label">GITHUB</span>
+                        <span class="row-value">VSKaveeshwara</span>
+                        <span class="row-action">OPEN ↗</span>
+                    </a>
+                    <a class="console-row" href="https://www.linkedin.com/in/venuka-sahan-509183360" target="_blank" rel="noopener">
+                        <span class="row-label">LINKEDIN</span>
+                        <span class="row-value">venuka-sahan</span>
+                        <span class="row-action">OPEN ↗</span>
+                    </a>
+                    <a class="console-row" href="mailto:vskaweeshwara1215@gmail.com">
+                        <span class="row-label">MAIL</span>
+                        <span class="row-value">Send a message</span>
+                        <span class="row-action">OPEN ↗</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Neon Contact Form -->
+        <div class="contact-form-card">
+            <h3>Send me a message</h3>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="name">YOUR NAME</label>
+                    <input type="text" id="name" name="name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">EMAIL ADDRESS</label>
+                    <div class="email-input-wrapper">
+                        <input type="email" id="email" name="email" placeholder="Email Address" required>
+                        <span class="email-lock-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="message">MESSAGE</label>
+                    <textarea id="message" name="message" placeholder="Tell me about your project..." rows="4" required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">
+                    Send message 
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </form>
+        </div>
+
+    </div>
+</section>
+
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
+
+    <footer>
+        © 2026 VSK
+    </footer>
+
+
+    <script type="module" src="script.js"></script>
+
+</body>
+
+</html>
