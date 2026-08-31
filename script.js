@@ -1,19 +1,14 @@
 import * as THREE from 'three';
 
-import {
-    OrbitControls
-} from 'three/addons/controls/OrbitControls.js';
-
-
-const reduceMotion =
-    window.matchMedia(
-        '(prefers-reduced-motion: reduce)'
-    ).matches;
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMobile = window.matchMedia('(max-width: 700px)').matches;
+const shouldUseHeavy3D = !isMobile && !reduceMotion;
 
 
 /* ============================================================
    FLOATING TRIANGLE SPACE BACKGROUND
    ============================================================ */
+
 const spatialCanvas = document.getElementById('spatial-canvas');
 const spatialCtx = spatialCanvas.getContext('2d');
 let triangles = [];
@@ -36,9 +31,14 @@ function resizeSpatialCanvas() {
 
 function createTriangles() {
     triangles = [];
-    const amount = Math.min(Math.max(Math.floor((window.innerWidth * window.innerHeight) / 16000), 40), 100);
+    // Fewer triangles on mobile to save battery/CPU
+    const maxCount = isMobile ? 40 : 90;
+    const amount = Math.min(
+        Math.max(Math.floor((window.innerWidth * window.innerHeight) / 18000), 20),
+        maxCount
+    );
     for (let i = 0; i < amount; i++) {
-        const size = Math.random() * 30 + 10;
+        const size = Math.random() * 28 + 8;
         triangles.push({
             x: Math.random() * window.innerWidth,
             y: Math.random() * window.innerHeight,
@@ -47,7 +47,7 @@ function createTriangles() {
             speedY: Math.random() * 0.28 + 0.03,
             rotation: Math.random() * Math.PI * 2,
             rotationSpeed: (Math.random() - 0.5) * 0.004,
-            opacity: Math.random() * 0.25 + 0.08,
+            opacity: Math.random() * 0.22 + 0.06,
             mouseStrength: Math.random() * 0.8 + 0.4,
             depth: Math.random() * 1.5 + 0.5,
             shape: Math.random() * 0.25 + 0.9
@@ -55,26 +55,31 @@ function createTriangles() {
     }
 }
 
-window.addEventListener('mousemove', (event) => {
-    targetMouseX = event.clientX;
-    targetMouseY = event.clientY;
-});
+// Only track mouse on non-touch devices
+if (!isMobile) {
+    window.addEventListener('mousemove', (event) => {
+        targetMouseX = event.clientX;
+        targetMouseY = event.clientY;
+    });
+}
 
 window.addEventListener('scroll', () => {
     scrollPosition = window.scrollY;
 }, { passive: true });
 
 function drawTriangle(triangle) {
-    triangleMouseX += (targetMouseX - triangleMouseX) * 0.05;
-    triangleMouseY += (targetMouseY - triangleMouseY) * 0.05;
-    const dx = triangle.x - triangleMouseX;
-    const dy = triangle.y - triangleMouseY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    if (distance < 220) {
-        const force = (220 - distance) / 220;
-        triangle.x += (dx / (distance || 1)) * force * 0.18 * triangle.mouseStrength;
-        triangle.y += (dy / (distance || 1)) * force * 0.18 * triangle.mouseStrength;
+    if (!isMobile) {
+        // Smooth lerp toward mouse position
+        triangleMouseX += (targetMouseX - triangleMouseX) * 0.05;
+        triangleMouseY += (targetMouseY - triangleMouseY) * 0.05;
+        const dx = triangle.x - triangleMouseX;
+        const dy = triangle.y - triangleMouseY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < 220) {
+            const force = (220 - distance) / 220;
+            triangle.x += (dx / (distance || 1)) * force * 0.18 * triangle.mouseStrength;
+            triangle.y += (dy / (distance || 1)) * force * 0.18 * triangle.mouseStrength;
+        }
     }
 
     const scrollOffset = (scrollPosition - previousScroll) * 0.08 * triangle.depth;
@@ -112,12 +117,9 @@ function animateTriangles() {
             triangle.y = -triangle.size;
             triangle.x = Math.random() * window.innerWidth;
         }
-        if (triangle.x > window.innerWidth + triangle.size) {
-            triangle.x = -triangle.size;
-        }
-        if (triangle.x < -triangle.size) {
-            triangle.x = window.innerWidth + triangle.size;
-        }
+        if (triangle.x > window.innerWidth + triangle.size) triangle.x = -triangle.size;
+        if (triangle.x < -triangle.size) triangle.x = window.innerWidth + triangle.size;
+
         drawTriangle(triangle);
     }
     previousScroll = scrollPosition;
@@ -131,43 +133,51 @@ if (reduceMotion) {
     animateTriangles();
 }
 
+let resizeTimer;
 window.addEventListener('resize', () => {
-    resizeSpatialCanvas();
-    if (reduceMotion) {
-        drawAllTriangles();
-    }
+    // Debounce resize to avoid thrashing on mobile orientation change
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        resizeSpatialCanvas();
+        if (reduceMotion) drawAllTriangles();
+    }, 150);
 });
 
 
 /* ============================================================
    HERO THREE.JS SCENE
    ============================================================ */
+
 const scene = new THREE.Scene();
 const modelContainer = document.getElementById('app');
+
+if (modelContainer && !shouldUseHeavy3D) {
+    modelContainer.style.opacity = '0.2';
+}
 
 const camera = new THREE.PerspectiveCamera(75, modelContainer.clientWidth / modelContainer.clientHeight, 0.1, 1000);
 camera.position.z = 5;
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer({
+    antialias: !isMobile,
+    alpha: true,
+    powerPreference: 'low-power'
+});
 renderer.setSize(modelContainer.clientWidth, modelContainer.clientHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2));
 modelContainer.appendChild(renderer.domElement);
-
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = !reduceMotion;
-controls.enableZoom = false;
-controls.enablePan = false;
-controls.maxDistance = 5;
 
 let mouseX = 0;
 let mouseY = 0;
 let lastMouseMoveTime = Date.now();
 
-window.addEventListener('mousemove', (event) => {
-    mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-    mouseY = (event.clientY / window.innerHeight) * 2 - 1;
-    lastMouseMoveTime = Date.now();
-});
+if (!isMobile) {
+    window.addEventListener('mousemove', (event) => {
+        mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+        lastMouseMoveTime = Date.now();
+    });
+}
 
 function buildShadowEntity() {
     const group = new THREE.Group();
@@ -202,13 +212,14 @@ function buildShadowEntity() {
         opacity: 0.55
     }));
 
-    const particleCount = 90;
+    // Fewer particles on mobile
+    const particleCount = isMobile ? 40 : 90;
     const particlePositions = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount; i++) {
         const r = 0.6 + Math.random() * 0.9;
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.acos((Math.random() * 2) - 1);
-        particlePositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        particlePositions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
         particlePositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
         particlePositions[i * 3 + 2] = r * Math.cos(phi);
     }
@@ -231,12 +242,11 @@ shadowFigure.scale.set(1.3, 1.3, 1.3);
 scene.add(shadowFigure);
 
 function animateHeroFrame() {
-    controls.update();
     const figure = scene.getObjectByName('shadowFigure');
     if (figure) {
         const idleThreshold = 1000;
         const timeSinceMove = Date.now() - lastMouseMoveTime;
-        if (!reduceMotion && timeSinceMove < idleThreshold) {
+        if (!reduceMotion && timeSinceMove < idleThreshold && !isMobile) {
             const targetRotationY = mouseX * 0.6;
             figure.rotation.y += (targetRotationY - figure.rotation.y) * 0.05;
         } else if (!reduceMotion) {
@@ -253,7 +263,7 @@ function animate() {
     animateHeroFrame();
 }
 
-if (reduceMotion) {
+if (reduceMotion || !shouldUseHeavy3D) {
     animateHeroFrame();
 } else {
     animate();
@@ -272,14 +282,14 @@ window.addEventListener('resize', () => {
     camera.aspect = modelContainer.clientWidth / modelContainer.clientHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(modelContainer.clientWidth, modelContainer.clientHeight);
-    if (reduceMotion) {
-        animateHeroFrame();
-    }
+    if (reduceMotion) animateHeroFrame();
 });
+
 
 /* ============================================================
    LOADING SCREEN
    ============================================================ */
+
 const loadingOverlay = document.getElementById('loading-overlay');
 const loadingText = document.getElementById('loading-text');
 
@@ -297,18 +307,18 @@ function runLoadingSequence() {
             requestAnimationFrame(step);
         } else {
             loadingOverlay.style.opacity = '0';
-            setTimeout(() => {
-                loadingOverlay.style.display = 'none';
-            }, 500);
+            setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
         }
     }
     requestAnimationFrame(step);
 }
 runLoadingSequence();
 
+
 /* ============================================================
    SCROLL REVEAL & GROUND
    ============================================================ */
+
 const groundGeometry = new THREE.PlaneGeometry(300, 300);
 const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x0c0c12 });
 const ground = new THREE.Mesh(groundGeometry, groundMaterial);
@@ -324,15 +334,13 @@ const revealObserver = new IntersectionObserver((entries) => {
             entry.target.classList.add('visible');
         }
     });
-}, { threshold: 0.15 });
-revealSections.forEach((section) => {
-    revealObserver.observe(section);
-});
+}, { threshold: 0.1 }); // Lower threshold so sections appear earlier on mobile
+
+revealSections.forEach((section) => revealObserver.observe(section));
 
 const heroSection = document.getElementById('home');
 let ticking = false;
-const isMobile = window.matchMedia('(max-width: 700px)').matches;
-const baseModelOpacity = isMobile ? 0.4 : 1;
+const baseModelOpacity = isMobile ? 0.3 : 1;
 
 function updateModelOnScroll() {
     const heroHeight = heroSection.offsetHeight;
@@ -345,9 +353,7 @@ function updateModelOnScroll() {
         figure.position.x = progress * 2.5;
         figure.position.y = progress * -0.6;
     }
-    if (reduceMotion) {
-        animateHeroFrame();
-    }
+    if (reduceMotion) animateHeroFrame();
 }
 
 window.addEventListener('scroll', () => {
@@ -361,18 +367,40 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 updateModelOnScroll();
 
+
 /* ============================================================
-   3D TECH CORE — ABOUT (Holographic Orbital Sphere)
+   3D TECH CORE — ABOUT (Lazy-loaded via IntersectionObserver)
    ============================================================ */
+
 const coreContainer = document.getElementById('tech-core-app');
+let coreInitialised = false;
+
 if (coreContainer) {
+    const coreObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !coreInitialised) {
+                coreInitialised = true;
+                initAboutCore();
+                coreObserver.disconnect();
+            }
+        });
+    }, { threshold: 0.1 });
+
+    coreObserver.observe(coreContainer);
+}
+
+function initAboutCore() {
     const coreScene = new THREE.Scene();
     const coreCamera = new THREE.PerspectiveCamera(45, coreContainer.clientWidth / coreContainer.clientHeight, 0.1, 1000);
     coreCamera.position.set(0, 0, 7);
 
-    const coreRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const coreRenderer = new THREE.WebGLRenderer({
+        antialias: !isMobile,
+        alpha: true,
+        powerPreference: 'low-power'
+    });
     coreRenderer.setSize(coreContainer.clientWidth, coreContainer.clientHeight);
-    coreRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    coreRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2));
     coreContainer.appendChild(coreRenderer.domElement);
 
     coreScene.add(new THREE.AmbientLight(0xffffff, 0.4));
@@ -408,27 +436,32 @@ if (coreContainer) {
     ring3.rotation.x = Math.PI / 1.5;
     coreGroup.add(ring1, ring2, ring3);
 
-    const particleCount = 60;
+    // Fewer particles on mobile
+    const particleCount = isMobile ? 30 : 60;
     const particleGeo = new THREE.BufferGeometry();
     const particlePos = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount; i++) {
         const r = 1.2 + Math.random() * 1.5;
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.acos((Math.random() * 2) - 1);
-        particlePos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        particlePos[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
         particlePos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
         particlePos[i * 3 + 2] = r * Math.cos(phi);
     }
     particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
-    const particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({ color: 0xffd166, size: 0.04, transparent: true, opacity: 0.8 }));
+    const particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({
+        color: 0xffd166, size: 0.04, transparent: true, opacity: 0.8
+    }));
     coreGroup.add(particles);
 
     let coreMouseX = 0;
     let coreMouseY = 0;
-    window.addEventListener('mousemove', (event) => {
-        coreMouseX = (event.clientX / window.innerWidth) * 2 - 1;
-        coreMouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-    });
+    if (!isMobile) {
+        window.addEventListener('mousemove', (event) => {
+            coreMouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            coreMouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+    }
 
     const coreClock = new THREE.Clock();
     function renderCoreFrame(elapsedTime) {
@@ -441,10 +474,12 @@ if (coreContainer) {
             ring3.rotation.y = elapsedTime * 0.2;
             particles.rotation.y = elapsedTime * -0.15;
             particles.rotation.z = elapsedTime * 0.1;
-            const targetRotX = coreMouseY * 0.15;
-            const targetRotZ = -coreMouseX * 0.15;
-            coreGroup.rotation.x += (targetRotX - coreGroup.rotation.x) * 0.08;
-            coreGroup.rotation.y += (targetRotZ - coreGroup.rotation.y) * 0.08;
+            if (!isMobile) {
+                const targetRotX = coreMouseY * 0.15;
+                const targetRotZ = -coreMouseX * 0.15;
+                coreGroup.rotation.x += (targetRotX - coreGroup.rotation.x) * 0.08;
+                coreGroup.rotation.y += (targetRotZ - coreGroup.rotation.y) * 0.08;
+            }
         }
         coreRenderer.render(coreScene, coreCamera);
     }
@@ -453,6 +488,7 @@ if (coreContainer) {
         requestAnimationFrame(animateCore);
         renderCoreFrame(coreClock.getElapsedTime());
     }
+
     if (reduceMotion) {
         renderCoreFrame(0);
     } else {
@@ -463,15 +499,15 @@ if (coreContainer) {
         coreCamera.aspect = coreContainer.clientWidth / coreContainer.clientHeight;
         coreCamera.updateProjectionMatrix();
         coreRenderer.setSize(coreContainer.clientWidth, coreContainer.clientHeight);
-        if (reduceMotion) {
-            renderCoreFrame(0);
-        }
+        if (reduceMotion) renderCoreFrame(0);
     });
 }
+
 
 /* ============================================================
    CONTACT CONSOLE — COPY EMAIL
    ============================================================ */
+
 document.querySelectorAll('[data-copy]').forEach((button) => {
     button.addEventListener('click', async () => {
         const value = button.getAttribute('data-copy');
@@ -489,27 +525,3 @@ document.querySelectorAll('[data-copy]').forEach((button) => {
         }, 1600);
     });
 });
-
-/* ============================================================
-   NEON CONTACT FORM — SUBMIT HANDLER
-   ============================================================ */
-const contactForm = document.getElementById('contactForm');
-if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const btn = contactForm.querySelector('.submit-btn');
-        const originalHTML = btn.innerHTML;
-        
-        // Show success state
-        btn.innerHTML = 'Message Sent ✓';
-        btn.style.background = '#28a745'; // Shift to deeper success green
-        
-        // Reset form and button after 3 seconds
-        setTimeout(() => {
-            btn.innerHTML = originalHTML;
-            btn.style.background = '';
-            contactForm.reset();
-        }, 3000);
-    });
-}
