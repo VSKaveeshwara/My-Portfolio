@@ -12,7 +12,7 @@
     --moss-bright: #6bb08c;
     --ember: #ffd166;
     --steel: #5b7cff;
-    
+
     --neon-green-bright: #39ff14;
     --neon-green-dim: rgba(57, 255, 20, 0.4);
     --neon-green-btn: #6cff4c;
@@ -21,9 +21,9 @@
     --mist: #8c9aa5;
     --dim: #626d76;
 
-    --font-display: 'Syne', Arial, sans-serif;
-    --font-body: 'Manrope', Arial, sans-serif;
-    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+    --font-display: 'Segoe UI', 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+    --font-body: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-mono: 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace;
 }
 
 
@@ -31,7 +31,9 @@
    RESET
    ============================================================ */
 
-* {
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -39,6 +41,8 @@
 
 html {
     scroll-behavior: smooth;
+    /* Prevent iOS elastic bounce causing horizontal overflow */
+    overflow-x: hidden;
 }
 
 body {
@@ -46,6 +50,9 @@ body {
     color: var(--ink);
     font-family: var(--font-body);
     overflow-x: hidden;
+    max-width: 100vw;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeSpeed;
 }
 
 a {
@@ -55,6 +62,11 @@ a {
 :focus-visible {
     outline: 2px solid var(--moss-bright);
     outline-offset: 3px;
+}
+
+img, video, canvas {
+    max-width: 100%;
+    display: block;
 }
 
 
@@ -95,13 +107,14 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    padding: 22px 6%;
+    padding: 18px 6%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 20;
     background: rgba(5, 6, 10, 0.55);
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--line);
 }
 
@@ -146,6 +159,92 @@ nav a:hover::after {
     width: 100%;
 }
 
+/* ============================================================
+   HAMBURGER MENU BUTTON
+   ============================================================ */
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    z-index: 21;
+    /* Minimum tap target size for mobile accessibility */
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+}
+
+.hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--ink);
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform-origin: center;
+}
+
+.hamburger.open span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger.open span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.hamburger.open span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Mobile nav overlay */
+.mobile-nav {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 6, 10, 0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 19;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 36px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-nav.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.mobile-nav a {
+    color: var(--mist);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 18px;
+    letter-spacing: .12em;
+    transition: color 0.2s ease;
+    text-transform: uppercase;
+    /* Generous tap targets */
+    padding: 10px 20px;
+}
+
+.mobile-nav a:hover,
+.mobile-nav a:active {
+    color: var(--moss-bright);
+}
+
 
 /* ============================================================
    SHARED SECTION EYEBROW / LABEL
@@ -177,12 +276,12 @@ section h2 span {
    ============================================================ */
 
 .hero {
-    height: 100vh;
-    min-height: 650px;
+    height: 100svh; /* Use small viewport height on mobile (avoids address bar overlap) */
+    min-height: 600px;
     position: relative;
     display: flex;
     align-items: center;
-    padding: 100px 7%;
+    padding: 100px 7% 60px;
     overflow: hidden;
     background:
         radial-gradient(circle at 30% 40%, rgba(61, 112, 87, 0.14) 0%, transparent 55%),
@@ -193,7 +292,7 @@ section h2 span {
 .hero-text {
     width: 54%;
     position: relative;
-    z-index: 5;
+    z-index: 5; /* Always above the 3D model */
 }
 
 .hero-text p {
@@ -219,7 +318,7 @@ h1 span {
 
 .hero h2 {
     font-family: var(--font-body);
-    font-size: clamp(19px, 2.6vw, 26px);
+    font-size: clamp(16px, 2.6vw, 26px);
     max-width: 460px;
     font-weight: 500;
     color: var(--mist);
@@ -236,6 +335,7 @@ h1 span {
     margin-top: 34px;
     display: flex;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
 .buttons a {
@@ -248,6 +348,11 @@ h1 span {
     letter-spacing: .08em;
     transition: 0.3s ease;
     display: inline-block;
+    /* Ensure tappable on mobile */
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .buttons a:hover {
@@ -478,6 +583,7 @@ section:not(.hero).visible {
     transition: .3s;
     position: relative;
     z-index: 3;
+    overflow: hidden; /* Prevent card content overflow */
 }
 
 .cards div:hover {
@@ -498,6 +604,7 @@ section:not(.hero).visible {
     line-height: 1.6;
     font-family: var(--font-mono);
     font-size: 13px;
+    word-break: break-word;
 }
 
 .cards small {
@@ -580,6 +687,7 @@ section:not(.hero).visible {
     align-items: center;
     gap: 12px;
     margin-bottom: 8px;
+    flex-wrap: wrap;
 }
 
 .quest-tag {
@@ -657,7 +765,16 @@ section:not(.hero).visible {
     align-items: start;
 }
 
-/* 1. Terminal-style contact console */
+.contact-subtitle {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--dim);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+/* ── Terminal-style contact console ── */
 .contact-console {
     width: 100%;
     border: 1px solid var(--line);
@@ -679,9 +796,10 @@ section:not(.hero).visible {
     height: 9px;
     border-radius: 50%;
     display: inline-block;
+    flex-shrink: 0;
 }
 
-.dot.red { background: #e5645a; }
+.dot.red   { background: #e5645a; }
 .dot.amber { background: var(--ember); }
 .dot.green { background: var(--moss-bright); }
 
@@ -714,13 +832,15 @@ section:not(.hero).visible {
     cursor: pointer;
     transition: background .25s ease;
     width: 100%;
+    min-height: 44px; /* Accessible tap target */
 }
 
 .console-row:last-child {
     border-bottom: none;
 }
 
-.console-row:hover {
+.console-row:hover,
+.console-row:focus-visible {
     background: rgba(107, 176, 140, 0.06);
 }
 
@@ -728,6 +848,7 @@ section:not(.hero).visible {
     font-size: 11px;
     letter-spacing: .08em;
     color: var(--dim);
+    flex-shrink: 0;
 }
 
 .row-value {
@@ -736,6 +857,7 @@ section:not(.hero).visible {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    min-width: 0; /* Required for text-overflow to work in grid */
 }
 
 .row-action {
@@ -745,13 +867,7 @@ section:not(.hero).visible {
     white-space: nowrap;
 }
 
-
-/* 2. Neon Contact Form (Based on image_793fb1.png) */
-
-/* ============================================================
-   UPDATED CONTACT FORM (Matches Portfolio Theme)
-   ============================================================ */
-
+/* ── Contact form card ── */
 .contact-form-card {
     background: radial-gradient(circle at top left, rgba(107, 176, 140, 0.1) 0%, rgba(11, 13, 18, 0.9) 50%);
     background-color: var(--panel);
@@ -765,10 +881,14 @@ section:not(.hero).visible {
 .contact-form-card h3 {
     color: var(--moss-bright);
     font-family: var(--font-display);
-    font-size: 26px;
+    font-size: clamp(20px, 3vw, 26px);
     font-weight: 800;
     margin-bottom: 30px;
     letter-spacing: -0.02em;
+}
+
+.form-group {
+    margin-bottom: 20px;
 }
 
 .form-group label {
@@ -787,12 +907,16 @@ section:not(.hero).visible {
     background: var(--void);
     border: 1px solid var(--line);
     border-radius: 12px;
-    padding: 16px;
+    padding: 14px 16px;
     color: var(--ink);
     font-family: var(--font-body);
-    font-size: 15px;
+    /* 16px prevents iOS auto-zoom on focus */
+    font-size: 16px;
     outline: none;
     transition: all 0.3s ease;
+    /* Improve rendering on mobile */
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .form-group textarea {
@@ -809,6 +933,50 @@ section:not(.hero).visible {
 .form-group input::placeholder,
 .form-group textarea::placeholder {
     color: var(--dim);
+}
+
+.email-input-wrapper {
+    position: relative;
+}
+
+.email-input-wrapper input {
+    padding-right: 44px;
+}
+
+.email-lock-icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ff5252;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+}
+
+/* Form status message */
+.form-status {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    margin-bottom: 12px;
+    min-height: 20px;
+    border-radius: 8px;
+    padding: 0;
+    transition: all 0.3s ease;
+}
+
+.form-status.success {
+    color: var(--moss-bright);
+    background: rgba(107, 176, 140, 0.08);
+    border: 1px solid rgba(107, 176, 140, 0.3);
+    padding: 10px 14px;
+}
+
+.form-status.error {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.08);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    padding: 10px 14px;
 }
 
 .submit-btn {
@@ -828,6 +996,7 @@ section:not(.hero).visible {
     gap: 8px;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(107, 176, 140, 0.25);
+    min-height: 52px;
 }
 
 .submit-btn:hover {
@@ -835,6 +1004,13 @@ section:not(.hero).visible {
     box-shadow: 0 6px 20px rgba(107, 176, 140, 0.4);
     background: #509371;
 }
+
+.submit-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
 
 /* ============================================================
    FOOTER
@@ -854,18 +1030,57 @@ footer {
 
 
 /* ============================================================
-   MOBILE
+   RESPONSIVE — TABLET  (≤ 900px)
    ============================================================ */
 
 @media (max-width: 900px) {
     .contact-wrapper {
         grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    section:not(.hero) {
+        padding: 110px 7% 70px;
+    }
+
+    .about-container {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .tech-core-model {
+        width: 100%;
+        height: 320px;
     }
 }
 
+
+/* ============================================================
+   RESPONSIVE — MOBILE  (≤ 700px)
+   ============================================================ */
+
 @media (max-width: 700px) {
+    /* ── Nav ── */
     nav {
         display: none;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .mobile-nav {
+        display: flex;
+    }
+
+    /* ── Hero ── */
+    .hero {
+        padding: 90px 6% 60px;
+        align-items: flex-start;
     }
 
     .hero-text {
@@ -874,44 +1089,155 @@ footer {
     }
 
     .model {
-        opacity: .4;
+        opacity: .25;
         z-index: 3;
+        pointer-events: none;
     }
 
+    #spatial-canvas {
+        opacity: 0.7;
+    }
+
+    .hero h2 {
+        font-size: clamp(15px, 4.2vw, 20px);
+        max-width: 100%;
+    }
+
+    /* ── Buttons ── */
+    .buttons {
+        gap: 10px;
+    }
+
+    .buttons a {
+        flex: 1 1 120px;
+        text-align: center;
+        padding: 14px 16px;
+        font-size: 10px;
+    }
+
+    /* ── Sections ── */
     .cards {
         grid-template-columns: 1fr;
     }
 
-    section:not(.hero) {
-        padding: 100px 7%;
+    .cards div {
+        padding: 24px;
+        min-height: auto;
     }
 
+    section:not(.hero) {
+        padding: 90px 6% 60px;
+    }
+
+    section h2 {
+        font-size: clamp(30px, 9vw, 52px);
+        margin: 12px 0 32px;
+    }
+
+    /* ── About ── */
     .about-container {
         flex-direction: column;
+        gap: 24px;
     }
 
     .tech-core-model {
         width: 100%;
-        height: 300px;
+        height: 260px;
     }
 
+    .description {
+        font-size: 16px;
+    }
+
+    /* ── Quest log ── */
+    .quest {
+        padding: 0 0 36px 50px;
+    }
+
+    /* ── Contact console ── */
     .console-row {
-        grid-template-columns: 70px 1fr auto;
-        padding: 16px;
+        grid-template-columns: 60px 1fr auto;
+        gap: 10px;
+        padding: 14px;
     }
 
     .row-value {
         font-size: 12px;
     }
 
+    .row-label {
+        font-size: 10px;
+    }
+
+    /* ── Contact form ── */
+    .contact-form-card {
+        padding: 24px 20px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .submit-btn {
+        min-height: 48px;
+    }
 }
 
-    
-.contact-subtitle {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    color: var(--dim);
-    margin-bottom: 12px;
-    text-transform: uppercase;
+
+/* ============================================================
+   RESPONSIVE — SMALL MOBILE  (≤ 480px)
+   ============================================================ */
+
+@media (max-width: 480px) {
+    header {
+        padding: 14px 5%;
+    }
+
+    .hero {
+        padding: 80px 5% 50px;
+    }
+
+    section:not(.hero) {
+        padding: 80px 5% 50px;
+    }
+
+    section h2 {
+        font-size: clamp(26px, 10vw, 44px);
+        margin: 10px 0 24px;
+    }
+
+    .buttons a {
+        flex: 1 1 100%;
+        text-align: center;
+    }
+
+    /* Hide action label; email overflows at this width */
+    .console-row {
+        grid-template-columns: 50px 1fr;
+        gap: 8px;
+    }
+
+    .row-action {
+        display: none;
+    }
+
+    /* Long email text: allow wrapping */
+    .row-value {
+        white-space: normal;
+        word-break: break-all;
+        font-size: 11px;
+    }
+
+    .tech-core-model {
+        height: 220px;
+    }
+
+    .contact-form-card {
+        padding: 20px 16px;
+        border-radius: 14px;
+    }
+
+    .contact-form-card h3 {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
 }
+
